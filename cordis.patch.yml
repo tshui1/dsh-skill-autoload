@@ -1,0 +1,8 @@
+# 本 bundle 的 patch：插入 skill-autoload 插件行。
+# aliasesPath 默认留空（只用自动关键词）；需要中文口语词时在 profile 的 patch 里覆盖 config。
+- insert:
+    - id: skill-autoload
+      name: dsh-skill-autoload
+      config:
+        mode: auto
+        maxSkills: 1
