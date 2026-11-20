@@ -16,6 +16,8 @@ DSH 的技能默认需要显式触发：
 问题是：模型不一定想到去调用。你装了「图片去水印」，发一句“这张图右下角有字帮我清掉”，模型可能直接开始写代码，而不是先加载那个技能里的成熟流程。
 
 本插件把“想起来”这一步去掉：**消息里出现技能相关词，技能就自动到场。**
+<img width="841" height="167" alt="image" src="https://github.com/user-attachments/assets/117d3a6c-b0be-4f8d-9ed5-f68651995684" />
+
 <img width="715" height="732" alt="image" src="https://github.com/user-attachments/assets/a2dc09b3-f426-49b4-b5e0-3a43398fa7d3" />
 
 
