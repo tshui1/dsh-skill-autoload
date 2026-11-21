@@ -1,6 +1,6 @@
 {
   "name": "dsh-skill-autoload",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "DeepSeek Harness plugin: auto-load the matching skill's instructions from the user's message, no trigger word needed, with a checkbox panel for picking which skills may auto-load. 按消息关键词自动加载已装技能的插件，无需触发词，并可在右侧栏勾选启用哪些技能。",
   "type": "module",
   "main": "index.js",
