@@ -178,6 +178,26 @@ function sendJson(res, status, payload) {
   }
 }
 
+/** 让 DSH 的 connection 服务对本路由做一次访问判决（Host/Origin 围栏 + 登录 cookie）。
+ *  该服务缺失或判决本身异常时保守拒绝：这条路由只服务本机 GUI，失败即关闭比放行安全。 */
+function connectionRejection(httpCtx, request) {
+  let connection
+  try {
+    connection = typeof httpCtx?.get === 'function' ? httpCtx.get('connection') : undefined
+  } catch {
+    connection = undefined
+  }
+  if (connection === undefined || connection === null || typeof connection.requestRejection !== 'function') {
+    return 403
+  }
+  try {
+    const rejection = connection.requestRejection(request)
+    return rejection === 401 || rejection === 403 ? rejection : undefined
+  } catch {
+    return 403
+  }
+}
+
 /** 只接受同源请求（浏览器面板）；无 Origin 的本地请求（curl）放行。 */
 function sameOrigin(request) {
   const origin = request?.headers?.origin
@@ -362,6 +382,10 @@ export function apply(ctx, config) {
       if (webServer === undefined || webServer === null || typeof webServer.register !== 'function') return
       const handler = async (request, response) => {
         try {
+          const rejection = connectionRejection(httpCtx, request)
+          if (rejection !== undefined) {
+            return sendJson(response, rejection, { ok: false, error: rejection === 401 ? 'unauthorized' : 'forbidden' })
+          }
           if (!sameOrigin(request)) return sendJson(response, 403, { ok: false, error: 'forbidden' })
           const method = String(request?.method ?? 'GET').toUpperCase()
           const url = new URL(String(request?.url ?? '/'), 'http://localhost')
