@@ -16,10 +16,6 @@ DSH 的技能默认需要显式触发：
 问题是：模型不一定想到去调用。你装了「图片去水印」，发一句“这张图右下角有字帮我清掉”，模型可能直接开始写代码，而不是先加载那个技能里的成熟流程。
 
 本插件把“想起来”这一步去掉：**消息里出现技能相关词，技能就自动到场。**
-<img width="841" height="167" alt="image" src="https://github.com/user-attachments/assets/117d3a6c-b0be-4f8d-9ed5-f68651995684" />
-
-<img width="715" height="732" alt="image" src="https://github.com/user-attachments/assets/a2dc09b3-f426-49b4-b5e0-3a43398fa7d3" />
-
 
 ## 特性
 
@@ -30,7 +26,7 @@ DSH 的技能默认需要显式触发：
 - **可关闭、可排除**：`autoKeywords: false` 只认别名表；`exclude` 排除个别技能。
 - **勾选式面板**：右侧栏「技能自动加载」列出全部已装技能，取消勾选即不再自动注入；composer 下方常驻入口。
 - **未勾选先询问**：命中未勾选的技能时，模型会先用 `ask_user_question` 问你「要不要启用它」，不会擅自加载；同一技能 24 小时内不重复问。
-- **工具与 HTTP**：`skill_autoload` 工具支持 list / enable / disable / enable_all / disable_all；面板通过 `/skill-autoload/state` 读写同一份状态。
+- **工具与 HTTP**：`skill_autoload` 工具支持 list / enable / disable / enable_all / disable_all；面板通过 `/skill-autoload/state` 读写同一份状态，该路由带 DSH 访问检查。
 - **零副作用**：只读技能目录与一个 JSON 文件；不联网、不执行命令；任何异常都静默返回原流程，绝不影响会话。
 
 ## 安装
@@ -148,6 +144,13 @@ DSH 的技能默认需要显式触发：
 4. 打分：命中词权重求和 + 最长命中词长度；别名词权重高于自动词；低于阈值丢弃；
 5. 去重后注入，`source.kind = "skill-invocation"`；
 6. 按勾选状态分流：已启用的注入正文/摘要；未启用的改注入询问提示（同一技能 24h 内只问一次）。
+
+## 安全
+
+- HTTP 路由 `/skill-autoload/state` 在做任何读写前，先调用 DSH 提供的 `ctx.connection.requestRejection()`：它执行 Host / Origin 围栏与浏览器登录 cookie 校验，未通过时直接返回 `401` / `403`。浏览器里任意网页因此无法调用本插件的接口。
+- 该服务不可用或判决本身抛错时按 **fail-closed** 拒绝，绝不放行。
+- 额外保留同源检查（Origin 与 Host 一致）作为纵深防御。
+- 除这条面板路由外不监听任何端口；插件不联网、不执行命令，只读写 `<DSH_HOME>/skill-autoload/state.json`。
 
 ## 兼容性
 
