@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+
+- 安全修复（市场维护者 fkysly 反馈）：`/skill-autoload/state` 路由现在先调用 DSH 的 `ctx.connection.requestRejection()`，执行 Host/Origin 围栏与浏览器登录校验；未登录或跨站请求返回 401/403。该服务不可用时按 fail-closed 拒绝，`sameOrigin` 作为纵深防御保留。
+- 因此浏览器里任意网页不再能调用本插件的状态接口。
+
 ## 0.2.1
 
 - 修复完整重启 DSH 后面板报 `Unexpected end of JSON input`：`webServer` 与 `tools` 服务可能晚于插件就绪，改为 `ctx.inject(['webServer'])` / `ctx.inject(['tools'])` 的 reactive 注册，冷启动与 HMR 热重载都能正确挂载路由与工具。
